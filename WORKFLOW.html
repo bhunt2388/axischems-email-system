@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Axis Chems — Email Workflow Schema</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background:#0d0d1a; color:#e5e5e5; padding:40px 24px; }
+.wrap { max-width:1200px; margin:0 auto; }
+
+h1 { font-size:24px; font-weight:800; color:#fff; margin-bottom:6px; }
+.sub { font-size:13px; color:#666; margin-bottom:40px; }
+
+/* FLOW */
+.flow-grid { display:flex; flex-direction:column; gap:48px; }
+.seq { background:#141423; border:1px solid #2a2a4a; border-radius:14px; overflow:hidden; }
+.seq-header { display:flex; align-items:center; gap:14px; padding:18px 24px; border-bottom:1px solid #2a2a4a; }
+.seq-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.seq-title { font-size:16px; font-weight:700; color:#fff; }
+.seq-trigger { font-size:12px; color:#666; margin-left:auto; font-style:italic; }
+
+.flow-row { display:flex; align-items:stretch; padding:0 24px; border-bottom:1px solid #1a1a2e; }
+.flow-row:last-child { border-bottom:none; }
+
+.node { flex:1; padding:16px 12px; position:relative; }
+.node-inner { background:#1e1e38; border-radius:10px; padding:14px 16px; height:100%; border-left:3px solid transparent; }
+.node-timing { font-size:10px; font-weight:700; color:#0b56c4; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:6px; }
+.node-code { font-family:'Courier New',monospace; font-size:12px; color:#888; margin-bottom:4px; }
+.node-subject { font-size:13px; font-weight:600; color:#fff; margin-bottom:6px; line-height:1.4; }
+.node-angle { font-size:11px; color:#666; }
+.tag { display:inline-block; background:#0b56c4; color:#fff; font-size:9px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 7px; border-radius:4px; margin-right:4px; margin-bottom:3px; }
+.tag.green { background:#146B3A; }
+.tag.red { background:#6b1414; }
+.tag.gray { background:#2a2a4a; color:#888; }
+
+/* ARROW */
+.arrow { width:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; color:#2a2a4a; font-size:20px; padding-top:16px; }
+
+/* NO-OPEN BRANCH */
+.branch { flex:1; padding:8px 12px 16px 12px; }
+.branch-label { font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.branch-label::before { content:""; display:inline-block; width:16px; height:1px; background:#333; }
+.branch-inner { background:#111120; border:1px dashed #2a2a4a; border-radius:8px; padding:12px 14px; }
+.branch-inner .node-subject { font-size:12px; color:#aaa; }
+.suppress { background:#1a0808; border:1px dashed #4a1a1a; border-radius:8px; padding:10px 14px; margin-top:8px; }
+.suppress-label { font-size:10px; font-weight:700; color:#6b3a3a; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px; }
+.suppress-text { font-size:11px; color:#444; }
+
+.row-wrap { display:grid; grid-template-columns:1fr 1fr; }
+
+/* LEGEND */
+.legend { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:32px; padding:14px 20px; background:#141423; border-radius:10px; border:1px solid #2a2a4a; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:#888; }
+.legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+.phase-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:#555; margin-bottom:12px; margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Axis Chems — Email Workflow Schema</h1>
+<p class="sub">20 emails · 7 sequences · full if-not-opened branching · Omnisend / Resend compatible</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#0b56c4"></div>Hard CTA (buy)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#146B3A"></div>Soft CTA (browse/learn)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div>Value / Discount</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6b1414"></div>Final / Win-back</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2a2a4a;border:1px dashed #4a4a6a"></div>If not opened branch</div>
+  <div class="legend-item" style="color:#6b3a3a">&#9888; = suppress/sunset</div>
+</div>
+
+<div class="flow-grid">
+
+<!-- ══ ABANDONED CART ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#f59e0b"></div>
+    <div class="seq-title">1 — Abandoned Cart</div>
+    <div class="seq-trigger">Trigger: cart created + email captured, no purchase within 45 min</div>
+  </div>
+
+  <div style="padding:0 24px">
+
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:16px 0">
+
+      <div class="node-inner" style="border-left-color:#f59e0b">
+        <div class="node-timing">+1 hour</div>
+        <div class="node-code">AC-1</div>
+        <div class="node-subject">"Your research compounds are still here."</div>
+        <div class="node-angle"><span class="tag">Trust</span><span class="tag">COA proof</span><span class="tag green">No discount</span></div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+
+      <div class="node-inner" style="border-left-color:#f59e0b">
+        <div class="node-timing">+24 hours</div>
+        <div class="node-code">AC-2</div>
+        <div class="node-subject">"The question we get asked most."</div>
+        <div class="node-angle"><span class="tag gray">Objections</span><span class="tag gray">Payment</span><span class="tag gray">Packaging</span></div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+
+      <div class="node-inner" style="border-left-color:#7c3aed">
+        <div class="node-timing">+72 hours</div>
+        <div class="node-code">AC-3</div>
+        <div class="node-subject">"Last chance — 5% off. Code: CART5"</div>
+        <div class="node-angle"><span class="tag" style="background:#7c3aed">CART5</span><span class="tag gray">48hr expiry</span></div>
+      </div>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div class="branch-inner" style="border-color:#333;background:transparent;padding:8px">
+        <div class="branch-label">If not opened 12hr</div>
+        <div style="font-size:11px;color:#555">&#8594; Send AC-2 early</div>
+      </div>
+      <div></div>
+      <div class="branch-inner" style="border-color:#333;background:transparent;padding:8px">
+        <div class="branch-label">If not opened 24hr</div>
+        <div style="font-size:11px;color:#555">&#8594; Send AC-3 on schedule</div>
+      </div>
+      <div></div>
+      <div class="suppress" style="margin-top:0">
+        <div class="suppress-label">&#9888; If not opened</div>
+        <div style="font-size:11px;color:#555">Tag: cart_sequence_complete. Move to Welcome if new contact.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ POST PURCHASE ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#22c55e"></div>
+    <div class="seq-title">2 — Post-Purchase</div>
+    <div class="seq-trigger">Trigger: order confirmed</div>
+  </div>
+  <div style="padding:0 24px">
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:16px 0">
+      <div class="node-inner" style="border-left-color:#22c55e">
+        <div class="node-timing">+1 hour</div>
+        <div class="node-code">PP-1</div>
+        <div class="node-subject">"Order confirmed — here's what happens next."</div>
+        <div class="node-angle"><span class="tag green">Confirm</span><span class="tag green">COA link</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#22c55e">
+        <div class="node-timing">Day 3</div>
+        <div class="node-code">PP-2</div>
+        <div class="node-subject">"Storage + handling for your {{compound_name}}"</div>
+        <div class="node-angle"><span class="tag gray">Education</span><span class="tag gray">Personalized</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#0b56c4">
+        <div class="node-timing">Day 7</div>
+        <div class="node-code">PP-3</div>
+        <div class="node-subject">"Researchers who ordered {{compound}} also studied..."</div>
+        <div class="node-angle"><span class="tag">Cross-sell</span><span class="tag">AOV lift</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div style="font-size:11px;color:#555;padding:4px 0">If not opened 4hr &#8594; resend: "Your Axis Chems order #X is confirmed"</div>
+      <div></div>
+      <div style="font-size:11px;color:#555;padding:4px 0">If not opened &#8594; skip PP-2, proceed to PP-3</div>
+      <div></div>
+      <div style="font-size:11px;color:#555;padding:4px 0">If not opened 48hr &#8594; resend: "The {{compound}} stack most researchers build next"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WELCOME NURTURE ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#a855f7"></div>
+    <div class="seq-title">3 — Welcome Nurture</div>
+    <div class="seq-trigger">Trigger: email signup, no purchase · ESP tag: subscriber_new</div>
+  </div>
+  <div style="padding:16px 24px">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
+      <div class="node-inner" style="border-left-color:#a855f7">
+        <div class="node-timing">Day 0</div>
+        <div class="node-code">WN-1</div>
+        <div class="node-subject">"Welcome to Axis Chems..."</div>
+        <div class="node-angle"><span class="tag green">Brand story</span></div>
+      </div>
+      <div class="node-inner" style="border-left-color:#a855f7">
+        <div class="node-timing">Day 2</div>
+        <div class="node-code">WN-2</div>
+        <div class="node-subject">"What your COA actually tells you..."</div>
+        <div class="node-angle"><span class="tag gray">Education</span></div>
+      </div>
+      <div class="node-inner" style="border-left-color:#a855f7">
+        <div class="node-timing">Day 5</div>
+        <div class="node-code">WN-3</div>
+        <div class="node-subject">"The 5 most researched compounds..."</div>
+        <div class="node-angle"><span class="tag">Top 5</span></div>
+      </div>
+      <div class="node-inner" style="border-left-color:#0b56c4">
+        <div class="node-timing">Day 9</div>
+        <div class="node-code">WN-4</div>
+        <div class="node-subject">"BPC-157 + TB-500 stack..."</div>
+        <div class="node-angle"><span class="tag">Stack/bundle</span></div>
+      </div>
+      <div class="node-inner" style="border-left-color:#7c3aed">
+        <div class="node-timing">Day 14</div>
+        <div class="node-code">WN-5</div>
+        <div class="node-subject">"10% off. Code: RESEARCH10"</div>
+        <div class="node-angle"><span class="tag" style="background:#7c3aed">RESEARCH10</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+      <div style="font-size:10px;color:#555">Not opened 24hr &#8594; resend diff subject</div>
+      <div style="font-size:10px;color:#555">Not opened &#8594; skip, continue to WN-3</div>
+      <div style="font-size:10px;color:#555">Not opened 48hr &#8594; resend diff subject</div>
+      <div style="font-size:10px;color:#555">Not opened &#8594; skip, proceed to WN-5</div>
+      <div class="suppress" style="margin-top:0">
+        <div class="suppress-label">&#9888; Double no-open</div>
+        <div style="font-size:10px;color:#555">Suppress from nurture. Broadcast only. Win-back at D90.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIP ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#eab308"></div>
+    <div class="seq-title">4 — VIP / Repeat Buyer</div>
+    <div class="seq-trigger">Trigger: 2nd purchase OR $500+ single order · ESP tag: vip</div>
+  </div>
+  <div style="padding:0 24px">
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:16px 0">
+      <div class="node-inner" style="border-left-color:#eab308">
+        <div class="node-timing">Immediately on VIP tag</div>
+        <div class="node-code">VIP-1</div>
+        <div class="node-subject">"You're on the Axis Chems VIP list."</div>
+        <div class="node-angle"><span class="tag gray">Status</span><span class="tag gray">Access</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#0b56c4">
+        <div class="node-timing">Day 30–45 (SKU-based)</div>
+        <div class="node-code">VIP-2</div>
+        <div class="node-subject">"Time to restock your {{compound_name}}?"</div>
+        <div class="node-angle"><span class="tag">Replenishment</span><span class="tag gray">Personalized</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div style="font-size:11px;color:#555">Not opened &#8594; skip VIP-1, proceed to VIP-2 on schedule</div>
+      <div></div>
+      <div style="font-size:11px;color:#555">Not opened 5 days &#8594; resend: "Don't let your research stall — {{compound}} back in stock" &#8594; if still no open &#8594; flag for win-back D90</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BROWSE ABANDONMENT ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#06b6d4"></div>
+    <div class="seq-title">5 — Browse Abandonment</div>
+    <div class="seq-trigger">Trigger: 2+ product page views, no add-to-cart, email known · ESP tag: browse_abandoned</div>
+  </div>
+  <div style="padding:0 24px">
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:16px 0">
+      <div class="node-inner" style="border-left-color:#06b6d4">
+        <div class="node-timing">+4 hours</div>
+        <div class="node-code">BA-1</div>
+        <div class="node-subject">"Still researching {{product_name}}?"</div>
+        <div class="node-angle"><span class="tag gray">Product reminder</span><span class="tag gray">Purity proof</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#0b56c4">
+        <div class="node-timing">+48 hours</div>
+        <div class="node-code">BA-2</div>
+        <div class="node-subject">"What researchers say about {{product_name}}"</div>
+        <div class="node-angle"><span class="tag">Social proof</span><span class="tag gray">Reviews</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div style="font-size:11px;color:#555">Not opened 24hr &#8594; send BA-2</div>
+      <div></div>
+      <div class="suppress" style="margin-top:0">
+        <div class="suppress-label">&#9888; If not opened</div>
+        <div style="font-size:10px;color:#555">Suppress browse sequence 30 days. Re-enters on next qualifying browse session.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WIN-BACK ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#ef4444"></div>
+    <div class="seq-title">6 — Win-Back</div>
+    <div class="seq-trigger">Trigger: 90 days since last purchase · ESP tag: inactive_90</div>
+  </div>
+  <div style="padding:0 24px">
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:16px 0">
+      <div class="node-inner" style="border-left-color:#ef4444">
+        <div class="node-timing">Day 90</div>
+        <div class="node-code">WB-1</div>
+        <div class="node-subject">"New compounds just landed at Axis Chems."</div>
+        <div class="node-angle"><span class="tag gray">New arrivals</span><span class="tag green">No discount</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#7c3aed">
+        <div class="node-timing">Day 97</div>
+        <div class="node-code">WB-2</div>
+        <div class="node-subject">"15% off — last chance. Code: WINBACK15"</div>
+        <div class="node-angle"><span class="tag" style="background:#7c3aed">WINBACK15</span><span class="tag red">Final send</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div style="font-size:11px;color:#555">Not opened 7 days &#8594; send WB-2</div>
+      <div></div>
+      <div class="suppress" style="margin-top:0">
+        <div class="suppress-label">&#9888; PERMANENT SUPPRESS</div>
+        <div style="font-size:10px;color:#555">Tag: sunset_suppressed. All sequences off. Broadcast only (1x/month max). Protects sender reputation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WHOLESALE ══ -->
+<div class="seq">
+  <div class="seq-header">
+    <div class="seq-dot" style="background:#10b981"></div>
+    <div class="seq-title">7 — Wholesale / B2B</div>
+    <div class="seq-trigger">Trigger: wholesale form submit OR cart $500+ OR wholesale tag · ESP tag: wholesale_lead</div>
+  </div>
+  <div style="padding:0 24px">
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:16px 0">
+      <div class="node-inner" style="border-left-color:#10b981">
+        <div class="node-timing">Immediately</div>
+        <div class="node-code">WS-1</div>
+        <div class="node-subject">"Your wholesale account is active."</div>
+        <div class="node-angle"><span class="tag green">Account live</span><span class="tag green">Rep intro</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#10b981">
+        <div class="node-timing">Day 3</div>
+        <div class="node-code">WS-2</div>
+        <div class="node-subject">"Full wholesale catalog + pricing tiers."</div>
+        <div class="node-angle"><span class="tag gray">Catalog</span><span class="tag gray">Tier pricing</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#2a2a4a;font-size:18px">&#8594;</div>
+      <div class="node-inner" style="border-left-color:#0b56c4">
+        <div class="node-timing">Day 21</div>
+        <div class="node-code">WS-3</div>
+        <div class="node-subject">"Restock alert + bulk pricing for forward orders."</div>
+        <div class="node-angle"><span class="tag">Urgency</span><span class="tag gray">Forward orders</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:0;padding:0 0 16px">
+      <div style="font-size:11px;color:#555">Not opened 4hr &#8594; direct call/text to phone on file</div>
+      <div></div>
+      <div style="font-size:11px;color:#555">Not opened 48hr &#8594; resend with plain subject line</div>
+      <div></div>
+      <div class="suppress" style="margin-top:0">
+        <div class="suppress-label">After WS-3 no-open</div>
+        <div style="font-size:10px;color:#555">Monthly broadcast only. Personal outreach for $2K+ leads.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- IMPLEMENTATION NOTES -->
+<div style="margin-top:48px;background:#141423;border:1px solid #2a2a4a;border-radius:14px;padding:28px 32px">
+  <h2 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:20px">Implementation Notes for Mansoor</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <p style="font-size:11px;font-weight:700;color:#0b56c4;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">ESP Setup</p>
+      <p style="font-size:13px;color:#888;line-height:1.7;margin-bottom:8px">Use <strong style="color:#fff">Omnisend</strong> for all marketing flows. DO NOT use Klaviyo — terminates peptide accounts.</p>
+      <p style="font-size:13px;color:#888;line-height:1.7;margin-bottom:8px">Sending domain: <code style="background:#1e1e38;padding:2px 6px;border-radius:4px;color:#0b56c4;font-size:12px">mail.axischems.com</code> — never root domain.</p>
+      <p style="font-size:13px;color:#888;line-height:1.7">Export list weekly to encrypted backup. The list is the asset.</p>
+    </div>
+    <div>
+      <p style="font-size:11px;font-weight:700;color:#0b56c4;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Build Order (ROI Priority)</p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:50%;background:#0b56c4;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">1</div><span style="font-size:13px;color:#888">Abandoned Cart (AC1–3) — fastest ROI</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:50%;background:#0b56c4;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">2</div><span style="font-size:13px;color:#888">Post-Purchase (PP1–3)</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:50%;background:#0b56c4;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">3</div><span style="font-size:13px;color:#888">Welcome Nurture (WN1–5)</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">4</div><span style="font-size:13px;color:#888">Browse Abandon, VIP, Win-Back, Wholesale</span></div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Compliance — Every Email</p>
+      <p style="font-size:13px;color:#888;line-height:1.7;margin-bottom:6px">Footer required: <em style="color:#fff">"For research use only. Not intended for human consumption."</em></p>
+      <p style="font-size:13px;color:#888;line-height:1.7">Never use: weight loss, healing, dose, safe for humans, treatment, before/after, results.</p>
+    </div>
+    <div>
+      <p style="font-size:11px;font-weight:700;color:#0b56c4;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Template Files</p>
+      <p style="font-size:13px;color:#888;line-height:1.7;margin-bottom:6px">20 HTML files in <code style="background:#1e1e38;padding:2px 6px;border-radius:4px;color:#0b56c4;font-size:12px">AxisChems_Emails/</code> folder.</p>
+      <p style="font-size:13px;color:#888;line-height:1.7;margin-bottom:6px">Logos are base64 embedded — no external image hosting needed.</p>
+      <p style="font-size:13px;color:#888;line-height:1.7">Dynamic tokens: <code style="background:#1e1e38;padding:2px 6px;border-radius:4px;color:#0b56c4;font-size:12px">{{double_curly}}</code> — replace with Omnisend merge tags.</p>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:32px 0 8px;font-size:11px;color:#333">Axis Chems LLC &nbsp;·&nbsp; Internal Use Only &nbsp;·&nbsp; axischems.com</div>
+
+</div>
+</body>
+</html>
